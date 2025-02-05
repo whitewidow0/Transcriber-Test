@@ -1,15 +1,18 @@
+from flask import Flask, jsonify
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
+import os
+
+app = Flask(__name__)
 
 def get_transcript(video_id):
-    """Fetch transcript from YouTube video and print the full text."""
+    """Fetch transcript from YouTube video."""
     try:
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
         full_transcript = " ".join([entry['text'] for entry in transcript])
-        print("\n=== 📜 Full Transcript ===\n")
-        print(full_transcript)
+        return full_transcript
     except Exception as e:
-        print(f"❌ Error fetching transcript: {e}")
+        return f"Error fetching transcript: {e}"
 
 def extract_video_id(url):
     """Extract YouTube video ID from multiple URL formats."""
@@ -18,12 +21,15 @@ def extract_video_id(url):
         return match.group(1)
     return None
 
-def main():
+@app.route('/')
+def index():
     video_id = 'ivy1sII_UnA'
-    
-    print(f"✅ Video ID: {video_id}")
-    print("📜 Fetching transcript...")
-    get_transcript(video_id)
+    transcript = get_transcript(video_id)
+    return jsonify({
+        "video_id": video_id,
+        "transcript": transcript
+    })
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
