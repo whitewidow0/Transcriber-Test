@@ -5,4 +5,4 @@ services:
     buildCommand: |
       python -m pip install --upgrade pip
       pip install -r requirements.txt
-    startCommand: gunicorn yt_transcriber:app
+    startCommand: gunicorn "yt_transcriber:create_app()"
